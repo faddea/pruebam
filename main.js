@@ -1080,8 +1080,9 @@ function openMercadoPagoApp() {
 
   if (isAndroid) {
     // Al no especificar un "scheme" concreto que requiera categoría browsable,
-    // Chrome le ordenará a Android lanzar directamente la actividad principal de la app (Launcher)
-    window.location.href = "intent:#Intent;package=com.mercadopago.wallet;end;";
+    // pero usando el protocolo correcto 'intent://', Chrome le ordenará a Android
+    // lanzar directamente la actividad principal de la app (Launcher)
+    window.location.href = "intent://#Intent;package=com.mercadopago.wallet;end;";
   } else if (isIOS) {
     // Protocolo directo para iOS
     window.location.href = "mpago://";
