@@ -3,4 +3,4 @@
 - [x] Crear un calendario en una página dedicada (Implementado como una pestaña completa y súper fluida en la navegación inferior).
 
 
-El botón de mercado pago debe abrirme directamente mercado pago en el celu no mandarme a un link de la pagina web de mercado pago.
+- [x] El botón de mercado pago debe abrirme directamente mercado pago en el celu no mandarme a un link de la pagina web de mercado pago (Implementado con deep linking inteligente e intents nativos para Android e iOS).

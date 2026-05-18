@@ -1074,6 +1074,26 @@ function renderCalendarDayDetails(db, dayStr) {
   lucide.createIcons();
 }
 
+function openMercadoPagoApp() {
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isAndroid) {
+    // Intent oficial para Android Chrome/Browsers (Abre la app o te lleva a Google Play Store si no está instalada)
+    window.location.href = "intent://#Intent;package=com.mercadopago.wallet;scheme=mercadopago;end;";
+  } else if (isIOS) {
+    // Protocolo directo para iOS
+    window.location.href = "mercadopago://";
+    // Fallback si no está instalada en 1.5s
+    setTimeout(() => {
+      window.location.href = "https://www.mercadopago.com.ar";
+    }, 1500);
+  } else {
+    // PC / Escritorio: Abre web oficial en pestaña nueva
+    window.open("https://www.mercadopago.com.ar", "_blank");
+  }
+}
+
 // ==========================================
 // 9. INICIALIZADOR DE LA APP
 // ==========================================
