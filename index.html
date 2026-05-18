@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Gestor de Gastos y Pagos</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#009EE3', // Mercado Pago Blue
+              hover: '#0085C0',
+            },
+            accent: {
+              green: '#10B981', // Success
+              red: '#EF4444', // Danger
+              yellow: '#F59E0B' // Warning
+            }
+          },
+          fontFamily: {
+            sans: ['Outfit', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom CSS Variables for Seamless Light/Dark Theme Switching -->
+  <style>
+    :root {
+      --bg-color: #F8FAFC;
+      /* Light Slate bg */
+      --text-color: #0F172A;
+      /* Slate 900 */
+      --text-muted: #64748B;
+      /* Slate 500 */
+      --card-bg: #FFFFFF;
+      --border-color: #E2E8F0;
+      /* Slate 200 */
+      --hover-bg: #F1F5F9;
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --modal-bg: rgba(255, 255, 255, 0.98);
+      --input-bg: #F8FAFC;
+    }
+
+    html.dark {
+      --bg-color: #080C14;
+      /* Deep dark bg */
+      --text-color: #F1F5F9;
+      /* Slate 100 */
+      --text-muted: #94A3B8;
+      /* Slate 400 */
+      --card-bg: #121B2E;
+      /* Slate 800 dark variant */
+      --border-color: #1E2C48;
+      --hover-bg: #19253F;
+      --nav-bg: rgba(8, 12, 20, 0.85);
+      --modal-bg: rgba(18, 27, 46, 0.98);
+      --input-bg: #080C14;
+    }
+
+    body {
+      font-family: 'Outfit', 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Custom simplified borders and cards */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .glass-modal {
+      background: var(--modal-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .glass-nav {
+      background: var(--nav-bg);
+      border-top: 1px solid var(--border-color);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    /* Safe Area bottom spacing */
+    .safe-bottom {
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+
+    /* Hide scrollbars but preserve functionality */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* View transition effect */
+    .view-tab {
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .view-tab.hidden {
+      display: none !important;
+      opacity: 0;
+      transform: scale(0.99);
+    }
+  </style>
+</head>
+
+<body class="h-full select-none flex flex-col justify-between">
+
+  <!-- TOP BAR / HEADER (SIMPLE & LIGHT DEFAULT) -->
+  <header
+    class="sticky top-0 z-40 w-full glass-nav border-b border-slate-200/50 dark:border-slate-800/50 px-4 py-3.5 flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100">
+        Gestor de Cuentas
+      </h1>
+    </div>
+
+    <button onclick="openSidebar()"
+      class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+      aria-label="Menú de opciones">
+      <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+  </header>
+
+  <!-- MAIN SCROLL CONTAINER -->
+  <main class="flex-1 overflow-y-auto pb-28 pt-4 px-4 w-full max-w-lg mx-auto">
+
+    <!-- ==============================================
+         1. DASHBOARD VIEW (SIMPLIFIED & CLEAN)
+         ============================================== -->
+    <section id="dashboard-view" class="view-tab space-y-5">
+
+      <!-- Balance Card (Simplified, elegant) -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Saldo
+            Disponible</span>
+          <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+            ARS
+          </span>
+        </div>
+        <h2 id="total-balance-card" class="text-4xl font-black text-slate-800 dark:text-white tracking-tight">$0,00</h2>
+
+        <div class="grid grid-cols-2 gap-4 mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800/60">
+          <div>
+            <span class="text-xs uppercase text-slate-400 dark:text-slate-500 block">Vencimientos Hoy</span>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span id="vencimientos-hoy-count" class="text-base font-bold text-accent-red">0</span>
+              <span class="text-sm text-slate-400 dark:text-slate-500">pendientes</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs uppercase text-slate-400 dark:text-slate-500 block">Gastos del Mes</span>
+            <span id="gastos-mes-monto"
+              class="text-base font-bold text-slate-700 dark:text-slate-200 block mt-0.5">$0,00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Grid (Compact Horizontal bar) -->
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="openModal('add-gasto-modal')"
+          class="glass-card hover:bg-slate-50 dark:hover:bg-slate-800/30 active:scale-95 transition-all py-2.5 rounded-xl flex items-center justify-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-accent-red"></i>
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-200">Gasto</span>
+        </button>
+
+        <button onclick="openModal('add-pago-modal')"
+          class="glass-card hover:bg-slate-50 dark:hover:bg-slate-800/30 active:scale-95 transition-all py-2.5 rounded-xl flex items-center justify-center gap-2">
+          <i data-lucide="calendar-plus" class="w-5 h-5 text-accent-yellow"></i>
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-200">Pago</span>
+        </button>
+
+        <a href="https://www.mercadopago.com.ar" target="_blank"
+          class="glass-card hover:bg-slate-50 dark:hover:bg-slate-800/30 active:scale-95 transition-all py-2.5 rounded-xl flex items-center justify-center gap-2 text-center">
+          <i data-lucide="external-link" class="w-5 h-5 text-primary"></i>
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-200">Mercado Pago</span>
+        </a>
+      </div>
+
+      <!-- Cuentas Section (Clean list-ready slider) -->
+      <div class="space-y-3.5">
+        <div class="flex justify-between items-center px-1">
+          <h3
+            class="text-sm font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+            <i data-lucide="wallet" class="w-5 h-5 text-primary"></i> Cuentas
+          </h3>
+          <button onclick="showTab('cuentas')" class="text-sm font-bold text-primary flex items-center gap-0.5">
+            Gestionar <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Horizontal Scroll Cuentas -->
+        <div id="cuentas-carrousel" class="flex gap-3 overflow-x-auto no-scrollbar pb-1 px-1">
+          <!-- Cuentas dynamically rendered inside h-28 boxes -->
+        </div>
+      </div>
+
+      <!-- Vencimientos Próximos Section -->
+      <div class="space-y-3">
+        <h3
+          class="text-sm font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1 flex items-center gap-1.5">
+          <i data-lucide="bell-ring" class="w-5 h-5 text-accent-yellow"></i> Vencimientos Próximos
+        </h3>
+
+        <div id="vencimientos-urgentes-list" class="space-y-2">
+          <!-- Dynamically populated clean items -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         2. GASTOS VIEW
+         ============================================== -->
+    <section id="gastos-view" class="view-tab hidden space-y-4">
+      <div class="flex justify-between items-center px-1">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Gastos</h2>
+          <span id="gastos-view-total" class="text-xs text-slate-400 dark:text-slate-500 font-bold block mt-0.5">Total este mes: $0</span>
+        </div>
+        <button onclick="openModal('add-gasto-modal')"
+          class="px-2.5 py-1 rounded-xl bg-accent-red hover:bg-accent-red/90 text-white text-sm font-bold transition-colors flex items-center gap-1">
+          <i data-lucide="plus" class="w-5 h-5"></i> Nuevo Gasto
+        </button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="glass-card rounded-2xl p-3.5 space-y-2.5">
+        <div class="relative">
+          <i data-lucide="search" class="w-5 h-5 text-slate-400 dark:text-slate-500 absolute left-3 top-2.5"></i>
+          <input type="text" id="gasto-search" placeholder="Buscar gasto..." oninput="filterGastos()"
+            class="w-full pl-8 pr-4 py-1.5 text-base rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 focus:border-primary focus:outline-none text-slate-700 dark:text-slate-200 transition-colors">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <select id="gasto-filter-cuenta" onchange="filterGastos()"
+            class="w-full px-3 py-1.5 text-base rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-200 focus:border-primary focus:outline-none">
+            <option value="">Todas las cuentas</option>
+          </select>
+          <select id="gasto-filter-categoria" onchange="filterGastos()"
+            class="w-full px-3 py-1.5 text-base rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-200 focus:border-primary focus:outline-none">
+            <option value="">Todas las categorías</option>
+            <option value="Alimentos">Alimentos</option>
+            <option value="Servicios">Servicios</option>
+            <option value="Transporte">Transporte</option>
+            <option value="Entretenimiento">Entretenimiento</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Mes Navigator -->
+      <div class="flex items-center justify-between px-1">
+        <button onclick="changeGastoMonth(-1)"
+          class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+          <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        </button>
+        <span id="gasto-active-month"
+          class="text-base font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Mayo 2026</span>
+        <button onclick="changeGastoMonth(1)"
+          class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+          <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Lista de Gastos Agrupados -->
+      <div id="gastos-grouped-list" class="space-y-3">
+        <!-- Dynamic list -->
+      </div>
+    </section>
+
+    <!-- ==============================================
+         2.5. CALENDARIO VIEW (DEDICATED FULL SCREEN VIEW)
+         ============================================== -->
+    <section id="calendario-view" class="view-tab hidden space-y-4">
+      <div class="flex justify-between items-center px-1">
+        <h2 class="text-lg font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Calendario</h2>
+      </div>
+
+      <!-- Month Filter Calendar -->
+      <div class="flex items-center justify-between px-1 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
+        <button onclick="changeCalendarMonth(-1)"
+          class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors">
+          <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        </button>
+        <span id="calendar-active-month"
+          class="text-base font-black text-slate-700 dark:text-slate-250 uppercase tracking-wider">Mayo 2026</span>
+        <button onclick="changeCalendarMonth(1)"
+          class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors">
+          <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Compact Calendar Grid Widget -->
+      <div class="glass-card rounded-2xl p-4 space-y-3">
+        <!-- Weekday Headers -->
+        <div class="grid grid-cols-7 gap-1 text-center text-xs font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+          <span>Dom</span>
+          <span>Lun</span>
+          <span>Mar</span>
+          <span>Mié</span>
+          <span>Jue</span>
+          <span>Vie</span>
+          <span>Sáb</span>
+        </div>
+        <!-- Days Grid -->
+        <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+          <!-- Rendered dynamically in JS -->
+        </div>
+      </div>
+
+      <!-- Selected Day Details Section -->
+      <div id="calendar-details-card" class="glass-card rounded-2xl p-4 space-y-3.5">
+        <div class="pb-2 border-b border-slate-100 dark:border-slate-800/65 flex justify-between items-center">
+          <h3 id="calendar-selected-day-title" class="text-sm font-extrabold uppercase tracking-wide text-slate-700 dark:text-slate-200">
+            Lunes 18 de Mayo
+          </h3>
+          <span class="text-xs font-bold text-slate-400 dark:text-slate-500">Detalle del Día</span>
+        </div>
+        <div id="calendar-day-items" class="space-y-3.5 max-h-72 overflow-y-auto">
+          <!-- Dynamic contents (Expenses or Payments for this day) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         3. PAGOS (AGENDA) VIEW
+         ============================================== -->
+    <section id="pagos-view" class="view-tab hidden space-y-4">
+      <div class="flex justify-between items-center px-1">
+        <h2 class="text-lg font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Agenda</h2>
+        <button onclick="openModal('add-pago-modal')"
+          class="px-2.5 py-1 rounded-xl bg-accent-yellow hover:bg-accent-yellow/90 text-white text-sm font-bold transition-colors flex items-center gap-1">
+          <i data-lucide="plus" class="w-5 h-5"></i> Nuevo Pago
+        </button>
+      </div>
+
+      <!-- Segmented Control (Tabs) -->
+      <div
+        class="bg-slate-100 dark:bg-slate-900 p-1 rounded-xl flex gap-1 border border-slate-200/50 dark:border-slate-800/80">
+        <button onclick="setPagosSubTab('pendientes')" id="pagos-tab-pendientes"
+          class="flex-1 py-1 text-base font-bold rounded-lg text-center transition-all bg-primary text-white shadow-sm">
+          Pendientes
+        </button>
+        <button onclick="setPagosSubTab('pagados')" id="pagos-tab-pagados"
+          class="flex-1 py-1 text-base font-bold rounded-lg text-center transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
+          Pagados
+        </button>
+      </div>
+
+      <!-- Month Filter Agenda -->
+      <div class="flex items-center justify-between px-1">
+        <button onclick="changePagoMonth(-1)"
+          class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+          <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        </button>
+        <span id="pago-active-month"
+          class="text-base font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Mayo 2026</span>
+        <button onclick="changePagoMonth(1)"
+          class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+          <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Lista de Pagos -->
+      <div id="pagos-list" class="space-y-2">
+        <!-- Dynamic content -->
+      </div>
+    </section>
+
+    <!-- ==============================================
+         4. CUENTAS VIEW
+         ============================================== -->
+    <section id="cuentas-view" class="view-tab hidden space-y-4">
+      <div class="flex justify-between items-center px-1">
+        <h2 class="text-lg font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Administrar
+          Cuentas</h2>
+        <button onclick="openModal('add-cuenta-modal')"
+          class="px-2.5 py-1 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-colors flex items-center gap-1">
+          <i data-lucide="plus" class="w-5 h-5"></i> Nueva Cuenta
+        </button>
+      </div>
+
+      <!-- Grid de Cuentas para Administrar -->
+      <div id="cuentas-admin-grid" class="grid grid-cols-1 gap-2.5">
+        <!-- Dynamic list -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==============================================
+       BOTTOM NAVIGATION BAR (GLASSMORPHIC)
+       ============================================== -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 glass-nav safe-bottom">
+    <div class="max-w-lg mx-auto flex items-center justify-around py-2.5 px-4">
+      <button onclick="showTab('dashboard')" id="nav-dashboard"
+        class="flex flex-col items-center gap-0.5 text-primary transition-all active:scale-90">
+        <i data-lucide="layout-grid" class="w-6 h-6"></i>
+        <span class="text-xs font-bold">Inicio</span>
+      </button>
+
+      <button onclick="showTab('gastos')" id="nav-gastos"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all active:scale-90">
+        <i data-lucide="receipt" class="w-6 h-6"></i>
+        <span class="text-xs font-bold">Gastos</span>
+      </button>
+
+      <button onclick="showTab('calendario')" id="nav-calendario"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all active:scale-90">
+        <i data-lucide="calendar" class="w-6 h-6"></i>
+        <span class="text-xs font-bold">Calendario</span>
+      </button>
+
+      <button onclick="showTab('pagos')" id="nav-pagos"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all active:scale-90">
+        <i data-lucide="bell-ring" class="w-6 h-6"></i>
+        <span class="text-xs font-bold">Pagos</span>
+      </button>
+
+      <button onclick="showTab('cuentas')" id="nav-cuentas"
+        class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all active:scale-90">
+        <i data-lucide="wallet" class="w-6 h-6"></i>
+        <span class="text-xs font-bold">Cuentas</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==============================================
+       MODALES
+       ============================================== -->
+
+  <!-- 1. Modal: Agregar Gasto -->
+  <div id="add-gasto-modal" onclick="closeModal('add-gasto-modal')"
+    class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
+        <h3 class="text-base font-extrabold uppercase tracking-wider text-accent-red flex items-center gap-1.5">
+          <i data-lucide="minus-circle" class="w-5 h-5"></i> Registrar Gasto
+        </h3>
+        <button onclick="closeModal('add-gasto-modal')"
+          class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-gasto" onsubmit="handleCreateGasto(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Monto ($)</label>
+          <input type="number" step="0.01" required id="gasto-monto" placeholder="0.00"
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-red focus:outline-none font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Descripción</label>
+          <input type="text" required id="gasto-descripcion" placeholder="Ej: Supermercado Coto"
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-red focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Cuenta</label>
+            <select required id="gasto-cuenta-select"
+              class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-red focus:outline-none">
+              <!-- Cuentas inyectadas por JS -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Categoría</label>
+            <select required id="gasto-categoria-select"
+              class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-red focus:outline-none">
+              <option value="Alimentos">Alimentos</option>
+              <option value="Servicios">Servicios</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Entretenimiento">Entretenimiento</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Fecha</label>
+          <input type="date" required id="gasto-fecha"
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-red focus:outline-none">
+        </div>
+
+        <div class="pt-1.5">
+          <button type="submit"
+            class="w-full py-2.5 rounded-xl bg-accent-red hover:bg-rose-600 text-white font-bold text-base uppercase tracking-wider transition-colors shadow-sm">
+            Registrar Gasto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Modal: Agregar Pago Pendiente -->
+  <div id="add-pago-modal" onclick="closeModal('add-pago-modal')"
+    class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
+        <h3 class="text-base font-extrabold uppercase tracking-wider text-accent-yellow flex items-center gap-1.5">
+          <i data-lucide="calendar-plus" class="w-5 h-5"></i> Programar Pago
+        </h3>
+        <button onclick="closeModal('add-pago-modal')"
+          class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-pago" onsubmit="handleCreatePago(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Servicio /
+            Impuesto</label>
+          <input type="text" required id="pago-nombre" placeholder="Ej: Cablevisión Mamá"
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-yellow focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Monto
+              ($)</label>
+            <input type="number" step="0.01" required id="pago-monto-input" placeholder="0.00"
+              class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-yellow focus:outline-none font-bold">
+          </div>
+          <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Vencimiento</label>
+            <input type="date" required id="pago-vencimiento"
+              class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-yellow focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-1.5">
+          <button type="submit"
+            class="w-full py-2.5 rounded-xl bg-accent-yellow hover:bg-amber-500 text-white font-bold text-base uppercase tracking-wider transition-colors shadow-sm">
+            Guardar en Agenda
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Modal: Agregar Cuenta -->
+  <div id="add-cuenta-modal" onclick="closeModal('add-cuenta-modal')"
+    class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
+        <h3 class="text-base font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
+          <i data-lucide="wallet-cards" class="w-5 h-5"></i> Nueva Cuenta
+        </h3>
+        <button onclick="closeModal('add-cuenta-modal')"
+          class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-cuenta" onsubmit="handleCreateCuenta(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Nombre</label>
+          <input type="text" required id="cuenta-nombre" placeholder="Ej: Galicia Sueldo, Efectivo"
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-primary focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Saldo Inicial
+            ($)</label>
+          <input type="number" step="0.01" required id="cuenta-saldo" placeholder="0.00"
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-primary focus:outline-none font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1.5">Color de
+            Identificación</label>
+          <div class="grid grid-cols-6 gap-2">
+            <label
+              class="relative flex items-center justify-center cursor-pointer aspect-square rounded-xl bg-primary border-2 border-transparent transition-all"><input
+                type="radio" name="cuenta-color" value="#009EE3" checked class="absolute opacity-0"></label>
+            <label
+              class="relative flex items-center justify-center cursor-pointer aspect-square rounded-xl bg-emerald-500 border-2 border-transparent transition-all"><input
+                type="radio" name="cuenta-color" value="#10B981" class="absolute opacity-0"></label>
+            <label
+              class="relative flex items-center justify-center cursor-pointer aspect-square rounded-xl bg-amber-500 border-2 border-transparent transition-all"><input
+                type="radio" name="cuenta-color" value="#F59E0B" class="absolute opacity-0"></label>
+            <label
+              class="relative flex items-center justify-center cursor-pointer aspect-square rounded-xl bg-indigo-500 border-2 border-transparent transition-all"><input
+                type="radio" name="cuenta-color" value="#6366F1" class="absolute opacity-0"></label>
+            <label
+              class="relative flex items-center justify-center cursor-pointer aspect-square rounded-xl bg-rose-500 border-2 border-transparent transition-all"><input
+                type="radio" name="cuenta-color" value="#F43F5E" class="absolute opacity-0"></label>
+            <label
+              class="relative flex items-center justify-center cursor-pointer aspect-square rounded-xl bg-slate-500 border-2 border-transparent transition-all"><input
+                type="radio" name="cuenta-color" value="#64748B" class="absolute opacity-0"></label>
+          </div>
+        </div>
+
+        <div class="pt-1.5">
+          <button type="submit"
+            class="w-full py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-base uppercase tracking-wider transition-colors shadow-sm">
+            Crear Cuenta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Modal: Confirmar Pago de Servicio -->
+  <div id="pay-confirm-modal" onclick="closeModal('pay-confirm-modal')"
+    class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
+        <h3 class="text-base font-extrabold uppercase tracking-wider text-accent-green flex items-center gap-1.5">
+          <i data-lucide="check-circle" class="w-5 h-5"></i> Confirmar Pago
+        </h3>
+        <button onclick="closeModal('pay-confirm-modal')"
+          class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div
+        class="mb-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/60">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm text-slate-400 dark:text-slate-500 font-bold uppercase">Servicio</span>
+          <span id="pay-service-name" class="text-base font-bold text-slate-700 dark:text-slate-200">-</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-slate-400 dark:text-slate-500 font-bold uppercase">Monto</span>
+          <span id="pay-service-amount" class="text-lg font-extrabold text-accent-green">$0,00</span>
+        </div>
+      </div>
+
+      <form id="form-pay-confirm" onsubmit="handleConfirmPayment(event)" class="space-y-3.5">
+        <input type="hidden" id="pay-service-id">
+        <div>
+          <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500 mb-1">Pagar con la
+            Cuenta</label>
+          <select required id="pay-cuenta-select"
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-base focus:border-accent-green focus:outline-none">
+            <!-- Cuentas inyectadas por JS -->
+          </select>
+        </div>
+
+        <div class="pt-1.5">
+          <button type="submit"
+            class="w-full py-2.5 rounded-xl bg-accent-green hover:bg-emerald-600 text-white font-bold text-base uppercase tracking-wider transition-colors shadow-sm">
+            Confirmar y Debitar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Sidebar Toggle Drawer (Right-to-Left Slide) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"
+    class="fixed inset-0 z-50 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300">
+  </div>
+
+  <div id="sidebar-panel"
+    class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-[var(--card-bg)] border-l border-[var(--border-color)] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
+    
+    <!-- Sidebar Header -->
+    <div class="p-5 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center">
+      <h3 class="text-base font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+        <i data-lucide="menu" class="w-5 h-5 text-primary"></i> Menú Ajustes
+      </h3>
+      <button onclick="closeSidebar()"
+        class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Sidebar Body -->
+    <div class="flex-1 overflow-y-auto p-5 space-y-6">
+      <!-- Saldo Total Section -->
+      <div class="glass-card rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/60">
+        <span class="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1">Saldo Total</span>
+        <span id="total-balance-sidebar" class="text-2xl font-black text-primary tracking-tight">$0,00</span>
+      </div>
+
+      <!-- Theme Selection -->
+      <div class="space-y-3">
+        <label class="block text-xs uppercase font-bold text-slate-400 dark:text-slate-500">Tema de la App</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="setTheme('light')" id="theme-btn-light"
+            class="py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold flex flex-col items-center justify-center gap-1 transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60">
+            <i data-lucide="sun" class="w-5 h-5 text-amber-500"></i>
+            <span>Claro</span>
+          </button>
+          <button onclick="setTheme('dark')" id="theme-btn-dark"
+            class="py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold flex flex-col items-center justify-center gap-1 transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60">
+            <i data-lucide="moon" class="w-5 h-5 text-indigo-400"></i>
+            <span>Oscuro</span>
+          </button>
+          <button onclick="setTheme('system')" id="theme-btn-system"
+            class="py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold flex flex-col items-center justify-center gap-1 transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60">
+            <i data-lucide="laptop" class="w-5 h-5 text-slate-400"></i>
+            <span>Sistema</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- App Info -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-800/60">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase block mb-1">Información</span>
+        <p class="text-xs text-slate-500 dark:text-slate-400">WalletFlow Local v1.1. Accesibilidad de tipografía mejorada.</p>
+      </div>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-5 border-t border-slate-100 dark:border-slate-800/60">
+      <button onclick="resetToDefaults()"
+        class="w-full py-2.5 rounded-xl border border-red-200 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-base font-bold transition-all flex items-center justify-center gap-1.5">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        Restablecer Datos
+      </button>
+    </div>
+  </div>
+
+  <!-- LOAD MAIN JS -->
+  <script src="main.js"></script>
+</body>
+
+</html>
