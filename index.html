@@ -200,7 +200,7 @@
           <span class="text-sm font-bold text-slate-700 dark:text-slate-200">Pago</span>
         </button>
 
-        <a href="https://www.mercadopago.com.ar" target="_blank"
+        <a href="mercadopago://" target="_blank"
           class="glass-card hover:bg-slate-50 dark:hover:bg-slate-800/30 active:scale-95 transition-all py-2.5 rounded-xl flex items-center justify-center gap-2 text-center">
           <i data-lucide="external-link" class="w-5 h-5 text-primary"></i>
           <span class="text-sm font-bold text-slate-700 dark:text-slate-200">Mercado Pago</span>
@@ -245,7 +245,8 @@
       <div class="flex justify-between items-center px-1">
         <div>
           <h2 class="text-lg font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Gastos</h2>
-          <span id="gastos-view-total" class="text-xs text-slate-400 dark:text-slate-500 font-bold block mt-0.5">Total este mes: $0</span>
+          <span id="gastos-view-total" class="text-xs text-slate-400 dark:text-slate-500 font-bold block mt-0.5">Total
+            este mes: $0</span>
         </div>
         <button onclick="openModal('add-gasto-modal')"
           class="px-2.5 py-1 rounded-xl bg-accent-red hover:bg-accent-red/90 text-white text-sm font-bold transition-colors flex items-center gap-1">
@@ -306,7 +307,8 @@
       </div>
 
       <!-- Month Filter Calendar -->
-      <div class="flex items-center justify-between px-1 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
+      <div
+        class="flex items-center justify-between px-1 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
         <button onclick="changeCalendarMonth(-1)"
           class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors">
           <i data-lucide="chevron-left" class="w-5 h-5"></i>
@@ -322,7 +324,8 @@
       <!-- Compact Calendar Grid Widget -->
       <div class="glass-card rounded-2xl p-4 space-y-3">
         <!-- Weekday Headers -->
-        <div class="grid grid-cols-7 gap-1 text-center text-xs font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+        <div
+          class="grid grid-cols-7 gap-1 text-center text-xs font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
           <span>Dom</span>
           <span>Lun</span>
           <span>Mar</span>
@@ -340,7 +343,8 @@
       <!-- Selected Day Details Section -->
       <div id="calendar-details-card" class="glass-card rounded-2xl p-4 space-y-3.5">
         <div class="pb-2 border-b border-slate-100 dark:border-slate-800/65 flex justify-between items-center">
-          <h3 id="calendar-selected-day-title" class="text-sm font-extrabold uppercase tracking-wide text-slate-700 dark:text-slate-200">
+          <h3 id="calendar-selected-day-title"
+            class="text-sm font-extrabold uppercase tracking-wide text-slate-700 dark:text-slate-200">
             Lunes 18 de Mayo
           </h3>
           <span class="text-xs font-bold text-slate-400 dark:text-slate-500">Detalle del Día</span>
@@ -461,7 +465,8 @@
   <!-- 1. Modal: Agregar Gasto -->
   <div id="add-gasto-modal" onclick="closeModal('add-gasto-modal')"
     class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
-    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+    <div onclick="event.stopPropagation()"
+      class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
       <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
         <h3 class="text-base font-extrabold uppercase tracking-wider text-accent-red flex items-center gap-1.5">
           <i data-lucide="minus-circle" class="w-5 h-5"></i> Registrar Gasto
@@ -525,7 +530,8 @@
   <!-- 2. Modal: Agregar Pago Pendiente -->
   <div id="add-pago-modal" onclick="closeModal('add-pago-modal')"
     class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
-    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+    <div onclick="event.stopPropagation()"
+      class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
       <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
         <h3 class="text-base font-extrabold uppercase tracking-wider text-accent-yellow flex items-center gap-1.5">
           <i data-lucide="calendar-plus" class="w-5 h-5"></i> Programar Pago
@@ -571,7 +577,8 @@
   <!-- 3. Modal: Agregar Cuenta -->
   <div id="add-cuenta-modal" onclick="closeModal('add-cuenta-modal')"
     class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
-    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+    <div onclick="event.stopPropagation()"
+      class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
       <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
         <h3 class="text-base font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
           <i data-lucide="wallet-cards" class="w-5 h-5"></i> Nueva Cuenta
@@ -634,7 +641,8 @@
   <!-- 4. Modal: Confirmar Pago de Servicio -->
   <div id="pay-confirm-modal" onclick="closeModal('pay-confirm-modal')"
     class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50 opacity-0 pointer-events-none transition-all duration-300">
-    <div onclick="event.stopPropagation()" class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
+    <div onclick="event.stopPropagation()"
+      class="w-full max-w-md glass-modal rounded-2xl p-5 translate-y-10 transition-transform duration-300 shadow-xl">
       <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100 dark:border-slate-800/60">
         <h3 class="text-base font-extrabold uppercase tracking-wider text-accent-green flex items-center gap-1.5">
           <i data-lucide="check-circle" class="w-5 h-5"></i> Confirmar Pago
@@ -685,10 +693,11 @@
 
   <div id="sidebar-panel"
     class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-[var(--card-bg)] border-l border-[var(--border-color)] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
-    
+
     <!-- Sidebar Header -->
     <div class="p-5 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center">
-      <h3 class="text-base font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+      <h3
+        class="text-base font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
         <i data-lucide="menu" class="w-5 h-5 text-primary"></i> Menú Ajustes
       </h3>
       <button onclick="closeSidebar()"
@@ -700,7 +709,8 @@
     <!-- Sidebar Body -->
     <div class="flex-1 overflow-y-auto p-5 space-y-6">
       <!-- Saldo Total Section -->
-      <div class="glass-card rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/60">
+      <div
+        class="glass-card rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/60">
         <span class="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1">Saldo Total</span>
         <span id="total-balance-sidebar" class="text-2xl font-black text-primary tracking-tight">$0,00</span>
       </div>
@@ -730,7 +740,8 @@
       <!-- App Info -->
       <div class="pt-4 border-t border-slate-100 dark:border-slate-800/60">
         <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase block mb-1">Información</span>
-        <p class="text-xs text-slate-500 dark:text-slate-400">WalletFlow Local v1.1. Accesibilidad de tipografía mejorada.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">WalletFlow Local v1.1. Accesibilidad de tipografía
+          mejorada.</p>
       </div>
     </div>
 
