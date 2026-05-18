@@ -1079,15 +1079,19 @@ function openMercadoPagoApp() {
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   if (isAndroid) {
-    // Intent oficial para Android Chrome/Browsers (Abre la app o te lleva a Google Play Store si no está instalada)
-    window.location.href = "intent://#Intent;package=com.mercadopago.wallet;scheme=mercadopago;end;";
+    // El scheme real de Mercado Pago registrado en Android es 'mpago' y no 'mercadopago'.
+    // Al usar scheme=mpago, Chrome abrirá la app directamente en lugar de mandarte a la Play Store.
+    window.location.href = "intent://#Intent;package=com.mercadopago.wallet;scheme=mpago;end;";
   } else if (isIOS) {
     // Protocolo directo para iOS
-    window.location.href = "mercadopago://";
-    // Fallback si no está instalada en 1.5s
+    window.location.href = "mpago://";
+    setTimeout(() => {
+      window.location.href = "mercadopago://";
+    }, 400);
+    // Fallback si no está instalada
     setTimeout(() => {
       window.location.href = "https://www.mercadopago.com.ar";
-    }, 1500);
+    }, 1800);
   } else {
     // PC / Escritorio: Abre web oficial en pestaña nueva
     window.open("https://www.mercadopago.com.ar", "_blank");
