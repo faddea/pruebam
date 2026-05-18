@@ -54,7 +54,7 @@ function setTheme(theme) {
 
 function applyTheme(theme) {
   document.documentElement.classList.remove('dark');
-  
+
   if (theme === 'dark') {
     document.documentElement.classList.add('dark');
   } else if (theme === 'system') {
@@ -63,7 +63,7 @@ function applyTheme(theme) {
       document.documentElement.classList.add('dark');
     }
   }
-  
+
   // Actualizar las clases visuales de los botones del modal de ajustes
   const themes = ['light', 'dark', 'system'];
   themes.forEach(t => {
@@ -111,14 +111,14 @@ let selectedCalendarDay = new Date().toISOString().split('T')[0]; // Día selecc
 
 function showTab(tabId) {
   activeTab = tabId;
-  
+
   const tabs = ['dashboard', 'gastos', 'calendario', 'pagos', 'cuentas'];
-  
+
   // Ocultar secciones y actualizar clases activas del bottom-nav
   tabs.forEach(tab => {
     const viewEl = document.getElementById(`${tab}-view`);
     const navBtn = document.getElementById(`nav-${tab}`);
-    
+
     if (tab === tabId) {
       viewEl.classList.remove('hidden');
       navBtn.className = 'flex flex-col items-center gap-0.5 text-primary transition-all scale-105 active:scale-90';
@@ -135,7 +135,7 @@ function setPagosSubTab(subTab) {
   pagosSubTab = subTab;
   const btnPendientes = document.getElementById('pagos-tab-pendientes');
   const btnPagados = document.getElementById('pagos-tab-pagados');
-  
+
   if (subTab === 'pendientes') {
     btnPendientes.className = 'flex-1 py-1 text-base font-bold rounded-lg text-center transition-all bg-primary text-white shadow-sm';
     btnPagados.className = 'flex-1 py-1 text-base font-bold rounded-lg text-center transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200';
@@ -154,7 +154,7 @@ function openModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.classList.remove('pointer-events-none', 'opacity-0');
   modal.classList.add('opacity-100');
-  
+
   const innerCard = modal.querySelector('.glass-modal');
   if (innerCard) {
     innerCard.classList.remove('translate-y-10');
@@ -179,7 +179,7 @@ function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.classList.add('pointer-events-none', 'opacity-0');
   modal.classList.remove('opacity-100');
-  
+
   const innerCard = modal.querySelector('.glass-modal');
   if (innerCard) {
     innerCard.classList.add('translate-y-10');
@@ -190,23 +190,23 @@ function closeModal(modalId) {
 function openSidebar() {
   const overlay = document.getElementById('sidebar-overlay');
   const panel = document.getElementById('sidebar-panel');
-  
+
   overlay.classList.remove('pointer-events-none', 'opacity-0');
   overlay.classList.add('opacity-100');
-  
+
   panel.classList.remove('translate-x-full');
   panel.classList.add('translate-x-0');
-  
+
   renderConsolidados();
 }
 
 function closeSidebar() {
   const overlay = document.getElementById('sidebar-overlay');
   const panel = document.getElementById('sidebar-panel');
-  
+
   overlay.classList.add('pointer-events-none', 'opacity-0');
   overlay.classList.remove('opacity-100');
-  
+
   panel.classList.add('translate-x-full');
   panel.classList.remove('translate-x-0');
 }
@@ -215,8 +215,8 @@ function populateAccountSelect(selectId) {
   const db = getDB();
   const select = document.getElementById(selectId);
   if (!select) return;
-  
-  select.innerHTML = db.cuentas.map(c => 
+
+  select.innerHTML = db.cuentas.map(c =>
     `<option value="${c.id}">${c.nombre} ($${formatNumber(c.saldo)})</option>`
   ).join('');
 }
@@ -243,13 +243,13 @@ function formatNumber(val) {
 function getRelativeTimeString(dateStr) {
   const date = new Date(dateStr);
   const now = new Date();
-  
+
   const dateReset = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const nowReset = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  
+
   const diffTime = dateReset - nowReset;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) return 'Hoy';
   if (diffDays === 1) return 'Mañana';
   if (diffDays === -1) return 'Ayer';
@@ -286,7 +286,7 @@ function handleCreateCuenta(e) {
 
   db.cuentas.push(newCuenta);
   saveDB(db);
-  
+
   closeModal('add-cuenta-modal');
   document.getElementById('form-cuenta').reset();
 }
@@ -305,7 +305,7 @@ function handleCreateGasto(e) {
 
   const cuenta = db.cuentas.find(c => c.id === cuentaId);
   if (!cuenta) return;
-  
+
   cuenta.saldo -= monto;
 
   const newGasto = {
@@ -419,9 +419,9 @@ function undoPayment(pagoId) {
   const pago = db.pagos.find(p => p.id === pagoId);
   if (!pago || !pago.pagado) return;
 
-  const gastoIndex = db.gastos.findIndex(g => 
-    g.cuenta_id === pago.cuenta_id && 
-    g.monto === pago.monto && 
+  const gastoIndex = db.gastos.findIndex(g =>
+    g.cuenta_id === pago.cuenta_id &&
+    g.monto === pago.monto &&
     g.descripcion === `Pago: ${pago.nombre}`
   );
 
@@ -461,7 +461,7 @@ function deleteCuenta(id) {
   if (!cuenta) return;
 
   const gastosVinculados = db.gastos.filter(g => g.cuenta_id === id).length;
-  const msg = gastosVinculados > 0 
+  const msg = gastosVinculados > 0
     ? `Eliminar "${cuenta.nombre}" dejará huérfanos a sus ${gastosVinculados} gastos. ¿Deseás continuar?`
     : `¿Seguro que querés eliminar la cuenta "${cuenta.nombre}"?`;
 
@@ -507,20 +507,20 @@ function triggerRenders() {
   } else if (activeTab === 'cuentas') {
     renderCuentasView();
   }
-  
+
   lucide.createIcons();
 }
 
 function renderConsolidados() {
   const db = getDB();
   const total = db.cuentas.reduce((sum, c) => sum + c.saldo, 0);
-  
+
   const headerEl = document.getElementById('total-balance-header');
   if (headerEl) headerEl.innerText = formatCurrency(total);
-  
+
   const sidebarEl = document.getElementById('total-balance-sidebar');
   if (sidebarEl) sidebarEl.innerText = formatCurrency(total);
-  
+
   const elCard = document.getElementById('total-balance-card');
   if (elCard) elCard.innerText = formatCurrency(total);
 }
@@ -528,12 +528,12 @@ function renderConsolidados() {
 // RENDER: PESTAÑA INICIO (DASHBOARD)
 function renderDashboard() {
   const db = getDB();
-  
+
   // 1. Vencimientos impagos urgentes
   const hoyStr = new Date().toISOString().split('T')[0];
   const vencidosHoy = db.pagos.filter(p => !p.pagado && p.fecha_vencimiento <= hoyStr).length;
   document.getElementById('vencimientos-hoy-count').innerText = vencidosHoy;
-  
+
   // 2. Gastos acumulados mes
   const hoy = new Date();
   const gastosMesMonto = db.gastos
@@ -564,7 +564,7 @@ function renderDashboard() {
           </div>
         `;
       }).join('');
-      
+
       // Caja rápida agregar cuenta
       html += `
         <div onclick="openModal('add-cuenta-modal')" class="flex-shrink-0 w-28 glass-card rounded-xl p-3 flex flex-col items-center justify-center h-24 border border-dashed border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/40 active:scale-95 cursor-pointer transition-all">
@@ -582,7 +582,7 @@ function renderDashboard() {
     const limDate = new Date();
     limDate.setDate(limDate.getDate() + 4);
     const limDateStr = limDate.toISOString().split('T')[0];
-    
+
     const proximos = db.pagos
       .filter(p => !p.pagado && p.fecha_vencimiento <= limDateStr)
       .sort((a, b) => a.fecha_vencimiento.localeCompare(b.fecha_vencimiento))
@@ -599,7 +599,7 @@ function renderDashboard() {
         const relativeTime = getRelativeTimeString(p.fecha_vencimiento);
         const isOverdue = new Date(p.fecha_vencimiento) < new Date(new Date().toISOString().split('T')[0]);
         const timeBadgeColor = isOverdue ? 'bg-accent-red/10 text-accent-red border-accent-red/20' : 'bg-accent-yellow/10 text-accent-yellow border-accent-yellow/20';
-        
+
         return `
           <div class="glass-card rounded-xl p-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -612,7 +612,7 @@ function renderDashboard() {
                   <span class="text-xs px-1.5 py-0.2 rounded border ${timeBadgeColor}">
                     ${relativeTime}
                   </span>
-                  <span class="text-xs text-slate-400 dark:text-slate-500 font-bold">${p.fecha_vencimiento.split('-').reverse().slice(0,2).join('/')}</span>
+                  <span class="text-xs text-slate-400 dark:text-slate-500 font-bold">${p.fecha_vencimiento.split('-').reverse().slice(0, 2).join('/')}</span>
                 </div>
               </div>
             </div>
@@ -655,7 +655,7 @@ function filterGastos() {
   const query = document.getElementById('gasto-search').value.toLowerCase().trim();
   const cuentaId = document.getElementById('gasto-filter-cuenta').value;
   const categoria = document.getElementById('gasto-filter-categoria').value;
-  
+
   let filtrados = db.gastos.filter(g => {
     const gDate = new Date(g.fecha);
     return gDate.getFullYear() === activeGastoDate.getFullYear() && gDate.getMonth() === activeGastoDate.getMonth();
@@ -696,7 +696,7 @@ function filterGastos() {
           const cuenta = db.cuentas.find(c => c.id === g.cuenta_id);
           const cuentaNombre = cuenta ? cuenta.nombre : 'Cuenta';
           const cuentaColor = cuenta ? cuenta.color : '#009EE3';
-          
+
           let catIcon = 'shopping-bag';
           if (g.categoria === 'Alimentos') catIcon = 'coffee';
           else if (g.categoria === 'Servicios') catIcon = 'plug-zap';
@@ -739,7 +739,7 @@ function filterGastos() {
           </div>
         `;
       }).join('');
-      
+
       lucide.createIcons();
     }
   }
@@ -774,7 +774,7 @@ function renderPagosView() {
       container.innerHTML = filtrados.map(p => {
         const relativeTime = getRelativeTimeString(p.fecha_vencimiento);
         const isOverdue = !p.pagado && new Date(p.fecha_vencimiento) < new Date(new Date().toISOString().split('T')[0]);
-        
+
         let statusBadge = '';
         let borderClass = '';
         let actionButton = '';
@@ -808,7 +808,7 @@ function renderPagosView() {
                 <h4 class="text-base font-bold text-slate-800 dark:text-slate-100">${p.nombre}</h4>
                 <div class="flex items-center gap-1.5 mt-0.5">
                   ${statusBadge}
-                  <span class="text-xs text-slate-400 dark:text-slate-500 font-bold">${p.fecha_vencimiento.split('-').reverse().slice(0,2).join('/')}</span>
+                  <span class="text-xs text-slate-400 dark:text-slate-500 font-bold">${p.fecha_vencimiento.split('-').reverse().slice(0, 2).join('/')}</span>
                 </div>
               </div>
             </div>
@@ -819,7 +819,7 @@ function renderPagosView() {
           </div>
         `;
       }).join('');
-      
+
       lucide.createIcons();
     }
   }
@@ -829,14 +829,14 @@ function renderPagosView() {
 function renderCuentasView() {
   const db = getDB();
   const grid = document.getElementById('cuentas-admin-grid');
-  
+
   if (grid) {
     if (db.cuentas.length === 0) {
       grid.innerHTML = `<div class="glass-card rounded-2xl p-6 text-center text-base text-slate-400 dark:text-slate-500">Sin cuentas activas.</div>`;
     } else {
       grid.innerHTML = db.cuentas.map(c => {
         const gastosCount = db.gastos.filter(g => g.cuenta_id === c.id).length;
-        
+
         return `
           <div class="glass-card rounded-xl p-3 flex items-center justify-between" style="border-left: 4px solid ${c.color}">
             <div class="flex items-center gap-3">
@@ -865,7 +865,7 @@ function renderCuentasView() {
           </div>
         `;
       }).join('');
-      
+
       lucide.createIcons();
     }
   }
@@ -887,28 +887,28 @@ function selectCalendarDay(dayStr) {
 
 function renderCalendarView() {
   const db = getDB();
-  
+
   // Nombres de meses en español
   const monthNames = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
   const activeYear = activeCalendarDate.getFullYear();
   const activeMonth = activeCalendarDate.getMonth();
-  
+
   document.getElementById('calendar-active-month').innerText = `${monthNames[activeMonth]} ${activeYear}`;
-  
+
   // Calcular primer día y cantidad total de días del mes
   const firstDayIndex = new Date(activeYear, activeMonth, 1).getDay(); // 0 = Domingo, 1 = Lunes...
   const totalDays = new Date(activeYear, activeMonth + 1, 0).getDate();
-  
+
   const prevMonthTotalDays = new Date(activeYear, activeMonth, 0).getDate();
-  
+
   const gridContainer = document.getElementById('calendar-grid');
   gridContainer.innerHTML = '';
-  
+
   const todayStr = new Date().toISOString().split('T')[0];
-  
+
   // 1. Relleno de días del mes anterior (grisados)
   for (let i = firstDayIndex - 1; i >= 0; i--) {
     const dNum = prevMonthTotalDays - i;
@@ -917,29 +917,29 @@ function renderCalendarView() {
     cell.innerText = dNum;
     gridContainer.appendChild(cell);
   }
-  
+
   // 2. Renderizar días del mes activo
   for (let d = 1; d <= totalDays; d++) {
     const mStr = String(activeMonth + 1).padStart(2, '0');
     const dStr = String(d).padStart(2, '0');
     const dayStr = `${activeYear}-${mStr}-${dStr}`;
-    
+
     const isToday = dayStr === todayStr;
     const isSelected = dayStr === selectedCalendarDay;
-    
+
     // Obtener gastos y pagos de este día
     const dayGastos = db.gastos.filter(g => g.fecha === dayStr);
     const dayPagos = db.pagos.filter(p => p.fecha_vencimiento === dayStr);
-    
+
     const hasExpenses = dayGastos.length > 0;
     const hasPendingBills = dayPagos.some(p => !p.pagado);
     const hasPaidBills = dayPagos.some(p => p.pagado);
-    
+
     const cell = document.createElement('div');
     cell.onclick = () => selectCalendarDay(dayStr);
-    
+
     let cellClasses = 'aspect-square rounded-xl flex flex-col items-center justify-between p-1.5 cursor-pointer transition-all active:scale-90 relative ';
-    
+
     if (isSelected) {
       cellClasses += 'bg-primary text-white font-extrabold shadow-md scale-102';
     } else if (isToday) {
@@ -947,9 +947,9 @@ function renderCalendarView() {
     } else {
       cellClasses += 'bg-slate-50/50 hover:bg-slate-100 dark:bg-slate-900/30 dark:hover:bg-slate-800/40 border border-slate-100 dark:border-slate-850/50 text-slate-700 dark:text-slate-300 font-bold';
     }
-    
+
     cell.className = cellClasses;
-    
+
     let dotIndicators = '';
     if (hasExpenses || hasPendingBills || hasPaidBills) {
       dotIndicators += '<div class="flex gap-0.5 justify-center w-full mt-0.5">';
@@ -964,15 +964,15 @@ function renderCalendarView() {
       }
       dotIndicators += '</div>';
     }
-    
+
     cell.innerHTML = `
       <span class="text-sm">${d}</span>
       ${dotIndicators}
     `;
-    
+
     gridContainer.appendChild(cell);
   }
-  
+
   // 3. Relleno de días del próximo mes
   const totalRenderedDays = firstDayIndex + totalDays;
   const nextMonthPadding = (7 - (totalRenderedDays % 7)) % 7;
@@ -982,7 +982,7 @@ function renderCalendarView() {
     cell.innerText = i;
     gridContainer.appendChild(cell);
   }
-  
+
   // 4. Detalles del día
   renderCalendarDayDetails(db, selectedCalendarDay);
 }
@@ -990,19 +990,19 @@ function renderCalendarView() {
 function renderCalendarDayDetails(db, dayStr) {
   const dateParts = dayStr.split('-');
   const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-  
+
   const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-  
+
   const titleText = `${daysOfWeek[dateObj.getDay()]} ${dateObj.getDate()} de ${months[dateObj.getMonth()]}`;
   document.getElementById('calendar-selected-day-title').innerText = titleText;
-  
+
   const itemsContainer = document.getElementById('calendar-day-items');
   itemsContainer.innerHTML = '';
-  
+
   const dayGastos = db.gastos.filter(g => g.fecha === dayStr);
   const dayPagos = db.pagos.filter(p => p.fecha_vencimiento === dayStr);
-  
+
   if (dayGastos.length === 0 && dayPagos.length === 0) {
     itemsContainer.innerHTML = `
       <div class="flex flex-col items-center justify-center py-6 text-slate-400 dark:text-slate-500">
@@ -1013,7 +1013,7 @@ function renderCalendarDayDetails(db, dayStr) {
     lucide.createIcons();
     return;
   }
-  
+
   // Gastos
   dayGastos.forEach(g => {
     const cuenta = db.cuentas.find(c => c.id === g.cuenta_id);
@@ -1033,27 +1033,25 @@ function renderCalendarDayDetails(db, dayStr) {
     `;
     itemsContainer.appendChild(item);
   });
-  
+
   // Pagos
   dayPagos.forEach(p => {
     const item = document.createElement('div');
-    item.className = `flex items-center justify-between p-3.5 rounded-2xl border ${
-      p.pagado 
-        ? 'bg-accent-green/5 border-accent-green/20' 
+    item.className = `flex items-center justify-between p-3.5 rounded-2xl border ${p.pagado
+        ? 'bg-accent-green/5 border-accent-green/20'
         : 'bg-accent-yellow/5 border-accent-yellow/20'
-    }`;
-    
+      }`;
+
     item.innerHTML = `
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center ${
-          p.pagado 
-            ? 'bg-accent-green/10 text-accent-green' 
-            : 'bg-accent-yellow/10 text-accent-yellow'
-        }">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center ${p.pagado
+        ? 'bg-accent-green/10 text-accent-green'
+        : 'bg-accent-yellow/10 text-accent-yellow'
+      }">
           <i data-lucide="${p.pagado ? 'check-circle' : 'alert-circle'}" class="w-5 h-5"></i>
         </div>
         <div>
-          <span class="text-base font-extrabold text-slate-800 dark:text-slate-100 block">${p.descripcion}</span>
+          <span class="text-base font-extrabold text-slate-800 dark:text-slate-100 block">${p.nombre}</span>
           <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">
             ${p.pagado ? 'Pagado' : 'Pendiente'} • Vence hoy
           </span>
@@ -1072,7 +1070,7 @@ function renderCalendarDayDetails(db, dayStr) {
     `;
     itemsContainer.appendChild(item);
   });
-  
+
   lucide.createIcons();
 }
 
@@ -1083,7 +1081,7 @@ function renderCalendarDayDetails(db, dayStr) {
 document.addEventListener('DOMContentLoaded', () => {
   // Aseguramos que la DB exista y esté cargada
   getDB();
-  
+
   // Inicializamos el tema guardado
   const savedTheme = localStorage.getItem('walletflow_theme') || 'system';
   applyTheme(savedTheme);
