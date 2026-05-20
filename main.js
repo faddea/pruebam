@@ -1038,8 +1038,8 @@ function renderCalendarDayDetails(db, dayStr) {
   dayPagos.forEach(p => {
     const item = document.createElement('div');
     item.className = `flex items-center justify-between p-3.5 rounded-2xl border ${p.pagado
-        ? 'bg-accent-green/5 border-accent-green/20'
-        : 'bg-accent-yellow/5 border-accent-yellow/20'
+      ? 'bg-accent-green/5 border-accent-green/20'
+      : 'bg-accent-yellow/5 border-accent-yellow/20'
       }`;
 
     item.innerHTML = `
@@ -1076,30 +1076,11 @@ function renderCalendarDayDetails(db, dayStr) {
 
 function openMercadoPagoApp() {
   const isAndroid = /Android/i.test(navigator.userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   if (isAndroid) {
-    // Formato correcto de intent:// para Chrome en Android.
-    // S.browser_fallback_url le indica a Chrome adónde ir si la app NO está instalada,
-    // evitando que abra la Play Store por defecto.
-    const fallback = encodeURIComponent("https://www.mercadopago.com.ar");
-    window.location.href = `intent://mercadopago#Intent;scheme=mercadopago;package=com.mercadopago.wallet;S.browser_fallback_url=${fallback};end`;
-
-  } else if (isIOS) {
-    // Protocolo directo para iOS (mpago:// es el scheme oficial de la app)
-    window.location.href = "mpago://";
-    setTimeout(() => {
-      window.location.href = "mercadopago://";
-    }, 400);
-    // Fallback si no está instalada
-    setTimeout(() => {
-      if (!document.hidden) {
-        window.location.href = "https://www.mercadopago.com.ar";
-      }
-    }, 1800);
+    window.location.href = "mercadopago://";
   } else {
-    // PC / Escritorio: Abre web oficial en pestaña nueva
-    window.open("https://www.mercadopago.com.ar", "_blank");
+    window.location.href = "https://www.mercadopago.com.ar";
   }
 }
 
