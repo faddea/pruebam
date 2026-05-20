@@ -1079,25 +1079,14 @@ function openMercadoPagoApp() {
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   if (isAndroid) {
-    // Usar el custom URL scheme de Mercado Pago directamente.
-    // El intent:// sin action/category válidos hace que Chrome caiga al fallback de Play Store.
-    // Con el scheme 'mercadopago://', si la app está instalada se abre; sino, usamos el fallback web.
-    const appUrl = "mercadopago://";
-    const fallbackUrl = "https://www.mercadopago.com.ar";
-
-    // Intentamos abrir el scheme nativo
-    window.location.href = appUrl;
-
-    // Fallback: si la app no está instalada, tras un breve delay abrimos la web
-    setTimeout(() => {
-      // Si el documento sigue visible (sin cambio de foco), la app no estaba instalada
-      if (!document.hidden) {
-        window.open(fallbackUrl, "_blank");
-      }
-    }, 1500);
+    // Formato correcto de intent:// para Chrome en Android.
+    // S.browser_fallback_url le indica a Chrome adónde ir si la app NO está instalada,
+    // evitando que abra la Play Store por defecto.
+    const fallback = encodeURIComponent("https://www.mercadopago.com.ar");
+    window.location.href = `intent://mercadopago#Intent;scheme=mercadopago;package=com.mercadopago.wallet;S.browser_fallback_url=${fallback};end`;
 
   } else if (isIOS) {
-    // Protocolo directo para iOS
+    // Protocolo directo para iOS (mpago:// es el scheme oficial de la app)
     window.location.href = "mpago://";
     setTimeout(() => {
       window.location.href = "mercadopago://";
