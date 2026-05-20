@@ -1074,13 +1074,48 @@ function renderCalendarDayDetails(db, dayStr) {
   lucide.createIcons();
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ESTRATEGIA DE APERTURA DE MERCADO PAGO (2025)
+//
+// ❌ LO QUE NO FUNCIONA DESDE UN NAVEGADOR WEB EXTERNO:
+//   - mercadopago://        → Chrome/Samsung Internet lo ignoran o van a Play Store
+//   - intent://mercadopago  → Android no encuentra ninguna Activity registrada como BROWSABLE
+//   - mpago://              → Solo funcionaba en iOS; en Android moderno está bloqueado
+//
+// ✅ LO QUE SÍ FUNCIONA:
+//   - Los links "mpago.la/..." son Android App Links oficiales de Mercado Pago.
+//     Mercado Pago tiene configurado un `assetlinks.json` en ese dominio, por lo
+//     que Android los verifica y abre la app directamente SIN pasar por Play Store.
+//   - Si la app está instalada: Android abre la app en el flujo correspondiente.
+//   - Si NO está instalada: el navegador abre la versión web del enlace (graceful fallback).
+//
+// 🔧 CÓMO OBTENER TU LINK DE COBRO PERSONALIZADO:
+//   1. Abrí la app de Mercado Pago → "Cobrar" → "Link de pago"
+//   2. Creá un link (puede ser sin monto fijo, solo con tu alias)
+//   3. Copiá el link que te genera (ej: https://mpago.la/xxxxxxx)
+//   4. Reemplazá MP_PAYMENT_LINK_URL abajo con ese link
+//
+// ⚠️ NO existe ningún deep link público de Mercado Pago para abrir directamente
+//    la pantalla de "Transferencias" o "Enviar dinero" desde fuera de su app.
+//    Mercado Pago deliberadamente no expone esas rutas internas a terceros.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Reemplazá este valor con tu link de cobro real generado desde tu cuenta de MP
+const MP_PAYMENT_LINK_URL = "https://mpago.la/TU_LINK_AQUI";
+
 function openMercadoPagoApp() {
   const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  if (isAndroid) {
-    window.location.href = "mercadopago://";
+  if (isAndroid || isIOS) {
+    // Los links mpago.la son App Links verificados por Android y Universal Links en iOS.
+    // El sistema operativo intercepta el dominio mpago.la y abre la app de MP directamente.
+    // Si la app NO está instalada, el SO deja que el navegador abra la URL (fallback a web).
+    // NO necesitamos detectar si está instalada ni hacer setTimeout: el OS lo maneja solo.
+    window.location.href = MP_PAYMENT_LINK_URL;
   } else {
-    window.location.href = "https://www.mercadopago.com.ar";
+    // En desktop, abrimos el link en pestaña nueva (también funciona como página web)
+    window.open(MP_PAYMENT_LINK_URL, "_blank", "noopener,noreferrer");
   }
 }
 
