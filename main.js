@@ -1101,7 +1101,7 @@ function renderCalendarDayDetails(db, dayStr) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Reemplazá este valor con tu link de cobro real generado desde tu cuenta de MP
-const MP_PAYMENT_LINK_URL = "https://mpago.la/TU_LINK_AQUI";
+const MP_PAYMENT_LINK_URL = "https://mpago.la";
 
 function openMercadoPagoApp() {
   const isAndroid = /Android/i.test(navigator.userAgent);
